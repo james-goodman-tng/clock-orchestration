@@ -1,0 +1,13 @@
+# Orchestration gitignore
+
+.DS_Store
+*.log
+
+# Don't track the service repos if they're cloned here
+api-*/
+fe-*/
+
+# But do track our orchestration configs
+!docker-compose.yml
+!*.sh
+!README.md

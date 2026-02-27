@@ -1,0 +1,134 @@
+version: '3.8'
+
+services:
+  # API Services
+  api-tokyo:
+    build: ../api-tokyo
+    container_name: api-tokyo
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+    restart: unless-stopped
+    networks:
+      - world-clock-network
+
+  api-london:
+    build: ../api-london
+    container_name: api-london
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+    restart: unless-stopped
+    networks:
+      - world-clock-network
+
+  api-newyork:
+    build: ../api-newyork
+    container_name: api-newyork
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+    restart: unless-stopped
+    networks:
+      - world-clock-network
+
+  api-sydney:
+    build: ../api-sydney
+    container_name: api-sydney
+    ports:
+      - "3004:3004"
+    environment:
+      - PORT=3004
+    restart: unless-stopped
+    networks:
+      - world-clock-network
+
+  api-mumbai:
+    build: ../api-mumbai
+    container_name: api-mumbai
+    ports:
+      - "3005:3005"
+    environment:
+      - PORT=3005
+    restart: unless-stopped
+    networks:
+      - world-clock-network
+
+  # Frontend Component Services
+  fe-tokyo:
+    build: ../fe-tokyo
+    container_name: fe-tokyo
+    ports:
+      - "8081:80"
+    depends_on:
+      - api-tokyo
+    restart: unless-stopped
+    networks:
+      - world-clock-network
+
+  fe-london:
+    build: ../fe-london
+    container_name: fe-london
+    ports:
+      - "8082:80"
+    depends_on:
+      - api-london
+    restart: unless-stopped
+    networks:
+      - world-clock-network
+
+  fe-newyork:
+    build: ../fe-newyork
+    container_name: fe-newyork
+    ports:
+      - "8083:80"
+    depends_on:
+      - api-newyork
+    restart: unless-stopped
+    networks:
+      - world-clock-network
+
+  fe-sydney:
+    build: ../fe-sydney
+    container_name: fe-sydney
+    ports:
+      - "8084:80"
+    depends_on:
+      - api-sydney
+    restart: unless-stopped
+    networks:
+      - world-clock-network
+
+  fe-mumbai:
+    build: ../fe-mumbai
+    container_name: fe-mumbai
+    ports:
+      - "8085:80"
+    depends_on:
+      - api-mumbai
+    restart: unless-stopped
+    networks:
+      - world-clock-network
+
+  # Master Frontend
+  fe-master:
+    build: ../fe-master
+    container_name: fe-master
+    ports:
+      - "8080:80"
+    depends_on:
+      - fe-tokyo
+      - fe-london
+      - fe-newyork
+      - fe-sydney
+      - fe-mumbai
+    restart: unless-stopped
+    networks:
+      - world-clock-network
+
+networks:
+  world-clock-network:
+    driver: bridge
