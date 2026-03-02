@@ -2,6 +2,23 @@
 
 This repository orchestrates the deployment of all 11 World Clock microservices.
 
+## 🌐 All Repositories Now on GitHub!
+
+All World Clock microservices are publicly available on GitHub! See **[GITHUB-SETUP.md](./GITHUB-SETUP.md)** for:
+- Complete list of GitHub repository URLs
+- Quick clone script (`./clone-all-repos.sh`)
+- Multiple setup options
+
+**Quick Setup from GitHub:**
+```bash
+# Clone all repos with one command
+bash <(curl -s https://raw.githubusercontent.com/james-goodman-tng/clock-orchestration/main/clone-all-repos.sh)
+
+# Start the system
+cd clock-orchestration
+./start-all.sh
+```
+
 ## Purpose
 
 This orchestration layer coordinates:
@@ -80,6 +97,8 @@ parent-directory/
 └── fe-master/
 ```
 
+**💡 Tip:** Use `./clone-all-repos.sh` to clone all repositories from GitHub automatically!
+
 ### Required Software
 
 - Docker
@@ -102,29 +121,25 @@ This allows you to:
 - Develop services locally
 - Test integration immediately
 - Use existing git repositories without changes
+- Clone from GitHub and start immediately
 
-### Future: Remote Repository Mode
+### GitHub Repositories
 
-In production, you could modify the orchestration to:
+All services are now available on GitHub at:
+- **Organization**: https://github.com/james-goodman-tng
+- **Pattern**: `https://github.com/james-goodman-tng/{repo-name}`
 
-1. **Clone from Git**:
-   ```bash
-   git clone https://github.com/org/api-tokyo
-   git clone https://github.com/org/api-london
-   # etc.
-   ```
+See [GITHUB-SETUP.md](./GITHUB-SETUP.md) for complete URLs and setup instructions.
 
-2. **Reference remote images**:
-   ```yaml
-   services:
-     api-tokyo:
-       image: ghcr.io/org/api-tokyo:latest
-   ```
+### Future: Remote Images Mode
 
-3. **Trigger remote deployments**:
-   - GitHub Actions
-   - Kubernetes deployments
-   - Cloud provider services
+In production, you could use published Docker images:
+
+```yaml
+services:
+  api-tokyo:
+    image: ghcr.io/james-goodman-tng/api-tokyo:latest
+```
 
 ## Service Ports
 
@@ -146,31 +161,21 @@ In production, you could modify the orchestration to:
 
 ### start-all.sh
 Starts all services with Docker Compose.
-- Validates required repositories exist
-- Builds images
-- Starts containers in background
-- Shows service URLs
 
 ### stop-all.sh
 Stops all running services.
-- Gracefully shuts down containers
-- Preserves images and volumes
 
 ### check-services.sh
 Health check for all services.
-- Tests HTTP connectivity
-- Color-coded status output
-- Shows service counts
 
 ### logs.sh
 View service logs.
-- All services: `./logs.sh`
-- Specific service: `./logs.sh <name>`
 
 ### restart-service.sh
 Restart individual service.
-- Useful for testing changes
-- No downtime for other services
+
+### clone-all-repos.sh
+Clone all service repositories from GitHub (NEW!)
 
 ## Docker Compose Configuration
 
@@ -238,123 +243,44 @@ docker-compose down --rmi all
 
 ## Deployment Scenarios
 
-### Current: Local Development
-All services run on localhost via Docker Compose.
-
-### Scenario 1: Single Server
-Deploy all containers to one production server:
+### Scenario 1: Clone from GitHub
 ```bash
-# On production server
-git clone <orchestration-repo>
+mkdir world-clock && cd world-clock
+bash <(curl -s https://raw.githubusercontent.com/james-goodman-tng/clock-orchestration/main/clone-all-repos.sh)
 cd clock-orchestration
-# Clone all service repos
 ./start-all.sh
 ```
 
 ### Scenario 2: Kubernetes
-Convert docker-compose to Kubernetes manifests:
-- Each service becomes a Deployment
-- Each gets a Service for networking
-- Ingress for external access
+Convert docker-compose to Kubernetes manifests
 
 ### Scenario 3: Multi-Region
-Deploy each service to appropriate region:
-- Tokyo services → Tokyo datacenter
-- London services → London datacenter
-- Master frontend → Global CDN
-
-### Scenario 4: CI/CD Pipeline
-Orchestration triggers remote deployments:
-```yaml
-# GitHub Actions example
-- name: Deploy Tokyo API
-  uses: trigger-deployment
-  with:
-    service: api-tokyo
-    region: asia-northeast1
-```
+Deploy services to appropriate regions
 
 ## Troubleshooting
 
 ### Port Already in Use
 ```bash
-# Find what's using the port
 lsof -i :8080
-
-# Stop the process or change port in docker-compose.yml
 ```
 
 ### Container Won't Start
 ```bash
-# View error logs
 docker-compose logs <service-name>
-
-# Try rebuilding
 docker-compose up --build <service-name>
 ```
 
-### Service Unreachable
+### Missing Repositories
 ```bash
-# Check if container is running
-docker-compose ps
-
-# Check network
-docker network ls
-docker network inspect clock-orchestration_world-clock-network
+bash <(curl -s https://raw.githubusercontent.com/james-goodman-tng/clock-orchestration/main/clone-all-repos.sh)
 ```
 
-### Changes Not Reflected
-```bash
-# Force rebuild
-docker-compose build --no-cache <service-name>
-docker-compose up -d <service-name>
-```
+## Resources
 
-## Adding a New Service
-
-To add a new city (e.g., Paris):
-
-1. **Create service repositories**:
-   ```bash
-   cd ..
-   mkdir api-paris fe-paris
-   # Set up service code
-   ```
-
-2. **Update docker-compose.yml**:
-   ```yaml
-   api-paris:
-     build: ../api-paris
-     ports: ["3006:3006"]
-   
-   fe-paris:
-     build: ../fe-paris
-     ports: ["8086:80"]
-     depends_on: [api-paris]
-   ```
-
-3. **Update fe-master** to include Paris iframe
-
-4. **Restart orchestration**:
-   ```bash
-   ./stop-all.sh
-   ./start-all.sh
-   ```
-
-## Repository Structure
-
-```
-clock-orchestration/
-├── .git/                    # Git repository
-├── docker-compose.yml       # Service definitions
-├── start-all.sh            # Start all services
-├── stop-all.sh             # Stop all services
-├── check-services.sh       # Health checks
-├── logs.sh                 # View logs
-├── restart-service.sh      # Restart single service
-├── .gitignore              # Git ignore rules
-└── README.md               # This file
-```
+- **GitHub Setup Guide**: [GITHUB-SETUP.md](./GITHUB-SETUP.md)
+- **Clone Script**: [clone-all-repos.sh](./clone-all-repos.sh)
+- **Meta Repository**: https://github.com/james-goodman-tng/world-clock-meta
+- **Organization**: https://github.com/james-goodman-tng
 
 ## Philosophy
 
@@ -365,6 +291,7 @@ This orchestration layer:
 ✅ **Provides convenience** - single command to start all
 ✅ **Enables testing** - easy local integration testing
 ✅ **Supports evolution** - can migrate to K8s, cloud, etc.
+✅ **GitHub-ready** - all services available on GitHub
 
 The orchestration is itself a service - a coordination service that knows how to deploy the full system.
 
